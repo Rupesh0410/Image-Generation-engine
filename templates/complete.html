@@ -1,0 +1,104 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to AI-inoday</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+    <style>
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            display: none;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <img src="/static/image_img/inoday-logo-new.jpg" alt="" style="width: 12%; display: block;">
+    <div class="topnav">
+        <a href="/">Home</a>
+        <a href="/generate">Generate Image using Text</a>
+        <a href="/sketch">Sketch To Image Transformation</a>
+        <a href="/beautify">Image Enhancement</a>
+        <a class="active" href="/complete">Image Expansion</a>
+        <a href="/search">Search and Replace</a>
+    </div>
+
+    <div class="responsive-three-column-grid">
+        <div>
+            <h3>Upload image</h3>
+            <form action="/generate_complete_image/" method="post" enctype="multipart/form-data" id="uploadForm">
+                <input type="file" name="file" accept="image/*" id="imageInput" onchange="displayInputImage(event)">
+                <img id="inputImage" src="" alt="" style="width: 100%; margin-top: 20px;">
+                <canvas id="canv1" style="display:none;"></canvas>
+                <h3>Enter the values</h3>
+                <input type="text" name="left" id="left" placeholder="Left" required>
+                <input type="text" name="right" id="right" placeholder="Right" required>
+                <input type="text" name="up" id="up" placeholder="Top" required>
+                <input type="text" name="down" id="down" placeholder="Bottom" required>
+                <input type="text" name="prompt" id="prompt" placeholder="Specify the changes you want to apply">
+                <input type="submit" value="Generate" onclick="upload(event)">
+            </form>
+        </div>
+        <div>
+            <h3>Output</h3>
+            <div class="loader" id="loader"></div>
+            <img id="outputImage" src="" alt="" style="width: 170%;">
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function displayInputImage(event) {
+            var inputImage = document.getElementById("inputImage");
+            inputImage.src = URL.createObjectURL(event.target.files[0]);
+        }
+
+        function upload(event) {
+            event.preventDefault();
+            var form = document.getElementById("uploadForm");
+            var formData = new FormData(form);
+            var loader = document.getElementById("loader");
+            var outputImage = document.getElementById("outputImage");
+
+            loader.style.display = "block";
+            outputImage.style.display = "none";
+
+            fetch("/generate_complete_image/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                var reader = new FileReader();
+                reader.onload = function() {
+                    loader.style.display = "none";
+                    outputImage.style.display = "block";
+                    outputImage.src = reader.result;
+                }
+                reader.readAsDataURL(blob);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                loader.style.display = "none";
+                outputImage.style.display = "block";
+            });
+        }
+    </script>
+
+</body>
+
+</html>

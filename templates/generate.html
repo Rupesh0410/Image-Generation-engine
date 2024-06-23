@@ -1,0 +1,163 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to AI-inoday </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css">
+    <style type="text/css">
+        /* container */
+        .responsive-three-column-grid {
+            display: block;
+        }
+
+        /* columns */
+        .responsive-three-column-grid > * {
+            padding: 1rem;
+        }
+
+        /* tablet breakpoint */
+        @media (min-width: 768px) {
+            .responsive-three-column-grid {
+                display: grid;
+                grid-auto-rows: 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        body {
+            padding: 0px 50px 50px 50px;
+        }
+
+        .select2-container--default {
+            .select2-selection--single {
+                border-color: #fff;
+                height: 60px;
+                padding: 7.5px 0;
+                border-radius: 0;
+                .select2-selection__arrow {
+                    height: 58px;
+                }
+            }
+        }
+
+        .select2-dropdown {
+            border-radius: 0;
+            box-shadow: #444 0px 3px 5px;
+            border: 0;
+        }
+
+        /* Add a black background color to the top navigation */
+        .topnav {
+            background-color: #333;
+            overflow: hidden;
+        }
+
+        /* Style the links inside the navigation bar */
+        .topnav a {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+
+        /* Change the color of links on hover */
+        .topnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        /* Add a color to the active/current link */
+        .topnav a.active {
+            background-color: #04AA6D;
+            color: white;
+        }
+
+        .spinner {
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            border: 5px solid lightgray;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+    <img src="/static/image_img/inoday-logo-new.jpg" alt="" style="width: 12%;display: block;">
+    <div class="topnav">
+        <a href="/">Home</a>
+        <a class="active" href="/generate">Generate Image using Text</a>
+        <a href="/sketch">Sketch To Image Transformation</a>
+        <a href="/beautify">Image Enhancement</a>
+        <a href="/complete">Image Expansion</a>
+        <a href="/search">Search and Replace</a>
+    </div>
+
+    <div class="responsive-three-column-grid">
+        <div>
+            <h3>Enter the values</h3>
+            <input type="text" id="prompt" placeholder="Describe the feature of the image you want to generate">
+            <button onclick="generateImage()">Generate</button>
+        </div>
+        <div>
+            <h3>Output</h3>
+            <div id="loader" class="spinner" style="display: none;"></div>
+            <img id="output_image" src="images/model.avif" alt="" style="width: 200%;">
+        </div>
+    </div>
+
+    <script>
+        async function generateImage() {
+            const prompt = document.getElementById("prompt").value;
+            const loader = document.getElementById("loader");
+            const outputImage = document.getElementById("output_image");
+
+            // Show the loader and hide the output image
+            loader.style.display = "block";
+            outputImage.style.display = "none";
+
+            try {
+                const response = await fetch("/generate_from_text/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        aspect_ratio: "1:1",
+                        output_format: "jpeg",
+                        model: "sd3"
+                    })
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    outputImage.src = url;
+                    outputImage.style.display = "block"; // Show the image
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.error}`);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+            } finally {
+                loader.style.display = "none"; // Hide the loader
+            }
+        }
+    </script>
+</body>
+
+</html>
