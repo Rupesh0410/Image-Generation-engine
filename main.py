@@ -71,7 +71,7 @@ async def read_random_file():
     path = f"{IMAGEDIR}{files[random_index]}"
     return FileResponse(path)
 
-STABILITY_KEY = 'sk-1ejsB6TPWJ7IqeqTTWm5qDyjfSoDRiEhIx1hoa5gbO6lb9Bv'
+STABILITY_KEY = 'Your Api key'
 
 class Sd3(BaseModel):
     prompt: str
